@@ -3,7 +3,7 @@
 **Grupa: 1145**
 
 ## Link video prezentare
-yt link TODO
+https://youtu.be/4y00axhq65U
 
 ## Link publicare
 http://51.20.69.169:8080/
