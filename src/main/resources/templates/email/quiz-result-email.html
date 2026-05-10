@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Result</title>
+</head>
+<body style="margin:0; padding:0; background:#f5f2ed; font-family:Arial, sans-serif; color:#0f0e0d;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f2ed; padding:40px 0;">
+    <tr>
+        <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #d8d3cb;">
+                <tr>
+                    <td style="background:#0f0e0d; padding:28px 32px;">
+                        <h1 style="margin:0; font-size:28px; color:#ffffff;">Your <span style="color:#e8441a;">Quiz Result</span></h1>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:32px;">
+                        <p style="margin:0 0 16px 0; font-size:16px;">
+                            Hi <strong th:text="${username}">User</strong>,
+                        </p>
+
+                        <p style="margin:0 0 16px 0; font-size:15px; line-height:1.7; color:#4d4943;">
+                            You completed the quiz:
+                            <strong th:text="${topic}">Cloud Computing</strong>
+                        </p>
+
+                        <div style="margin:24px 0; padding:20px; border-radius:12px; background:#f9f7f3; border:1px solid #e7e1d9;">
+                            <p style="margin:0 0 8px 0; font-size:14px; color:#7a756e;">Final score</p>
+                            <p style="margin:0; font-size:32px; font-weight:bold; color:#1e7a42;">
+                                <span th:text="${score}">4</span>/<span th:text="${totalQuestions}">5</span>
+                            </p>
+                        </div>
+
+                        <p style="margin:0 0 10px 0; font-size:15px; font-weight:bold;">Feedback</p>
+                        <p th:text="${feedback}"
+                           style="margin:0 0 24px 0; font-size:15px; line-height:1.7; color:#4d4943;">
+                            Good job.
+                        </p>
+
+                        <a href="http://localhost:8080/quizzes"
+                           style="display:inline-block; background:#0f0e0d; color:#ffffff; text-decoration:none; padding:14px 20px; border-radius:10px; font-size:14px; font-weight:bold;">
+                            View quiz history
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px 32px; border-top:1px solid #ebe6de; font-size:12px; color:#7a756e;">
+                        This is an automated message from QuizGen.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

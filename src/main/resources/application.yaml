@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: quiz-generator
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/quiz-generator-db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+
+    enabled: true
+    baseline-on-migrate: true
+
+  thymeleaf:
+    cache: true
+
+  mail:
+    host: smtp.sendgrid.net
+    port: 587
+    username: apikey
+    password: ${SENDGRID_API_KEY}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+app:
+  mail:
+    from: ${APP_MAIL_FROM}
+
+  openai:
+    api-key: ${OPENAI_API_KEY}
+    model: gpt-5-mini
+
+server:
+  port: 8080

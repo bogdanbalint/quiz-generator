@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>QuizGen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --ink: #0f0e0d;
+            --paper: #f5f2ed;
+            --accent: #e8441a;
+            --muted: #7a756e;
+            --border: #d8d3cb;
+            --card: #ffffff;
+            --card-dark: rgba(255,255,255,0.04);
+            --card-dark-border: rgba(255,255,255,0.08);
+            --shadow: 0 12px 30px rgba(15,14,13,0.06);
+        }
+
+        html, body {
+            min-height: 100%;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .panel-left {
+            width: 36%;
+            min-width: 320px;
+            max-width: 520px;
+            background-color: var(--ink);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 36px 38px;
+            position: relative;
+            overflow: hidden;
+            animation: slideInLeft 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to   { transform: translateX(0); opacity: 1; }
+        }
+
+        .panel-left::before {
+            content: '';
+            position: absolute;
+            top: -120px;
+            right: -120px;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232,68,26,0.22) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .panel-left::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232,68,26,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+
+        .left-content {
+            position: relative;
+            z-index: 1;
+            padding: 28px 0;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 14px;
+        }
+
+        .eyebrow::before {
+            content: '';
+            display: block;
+            width: 20px;
+            height: 1.5px;
+            background: var(--accent);
+        }
+
+        .left-content h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.25rem, 4vw, 3.3rem);
+            font-weight: 800;
+            line-height: 1.02;
+            letter-spacing: -0.05em;
+            color: #fff;
+            margin-bottom: 16px;
+            max-width: 420px;
+        }
+
+        .left-content h1 span {
+            color: var(--accent);
+        }
+
+        .left-content p {
+            max-width: 390px;
+            color: rgba(255,255,255,0.56);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .mini-features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mini-feature {
+            background: var(--card-dark);
+            border: 1px solid var(--card-dark-border);
+            border-radius: 14px;
+            padding: 15px 16px;
+        }
+
+        .mini-feature-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.92);
+            margin-bottom: 4px;
+        }
+
+        .mini-feature-text {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.42);
+            line-height: 1.5;
+        }
+
+        .panel-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 38px 40px;
+            overflow-y: auto;
+            animation: fadeUp 0.6s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from { transform: translateY(28px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
+
+        .content-wrapper {
+            width: 100%;
+            max-width: 820px;
+        }
+
+        .auth-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 0.88rem;
+            color: var(--muted);
+            margin-bottom: 22px;
+        }
+
+        .auth-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #34c759;
+        }
+
+        .top-copy {
+            margin-bottom: 28px;
+        }
+
+        .top-copy .step-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 14px;
+        }
+
+        .top-copy .step-label::before {
+            content: '';
+            display: block;
+            width: 20px;
+            height: 1.5px;
+            background: var(--accent);
+        }
+
+        .top-copy h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.15rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.06;
+            color: var(--ink);
+            margin-bottom: 12px;
+            max-width: 700px;
+        }
+
+        .top-copy p {
+            color: var(--muted);
+            font-size: 0.96rem;
+            line-height: 1.75;
+            max-width: 680px;
+        }
+
+        .cta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.15s, background 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--ink);
+            color: #fff;
+            border: 1px solid var(--ink);
+        }
+
+        .btn-primary:hover {
+            background: #252321;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: var(--ink);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(232,68,26,0.45);
+            color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 18px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-large {
+            grid-column: span 7;
+        }
+
+        .card-medium {
+            grid-column: span 5;
+        }
+
+        .card-full {
+            grid-column: span 12;
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.08rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.65;
+            margin-bottom: 18px;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .feature-item {
+            border: 1px dashed var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            background: rgba(255,255,255,0.68);
+        }
+
+        .feature-item-title {
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 5px;
+        }
+
+        .feature-item-text {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        .simple-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .simple-item {
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(216,211,203,0.55);
+        }
+
+        .simple-item:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .simple-item-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .simple-item-text {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        @media (max-width: 1100px) {
+            .card-large,
+            .card-medium,
+            .card-full {
+                grid-column: span 12;
+            }
+        }
+
+        @media (max-width: 820px) {
+            body {
+                flex-direction: column;
+                overflow: auto;
+            }
+
+            .panel-left {
+                width: 100%;
+                max-width: none;
+                min-width: 0;
+                gap: 28px;
+                padding: 30px 24px;
+            }
+
+            .panel-right {
+                padding: 28px 20px 40px;
+            }
+
+            .top-copy h2 {
+                font-size: 1.85rem;
+            }
+
+            .cta-row {
+                flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="panel-left">
+    <div class="brand">
+        <div class="brand-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z"/>
+            </svg>
+        </div>
+        <span class="brand-name">QuizGen</span>
+    </div>
+
+    <div class="left-content">
+        <span class="eyebrow">Cloud quiz platform</span>
+        <h1>Create quizzes with <span>AI and email workflows.</span></h1>
+        <p>
+            QuizGen is a modern web application where users can create quizzes with AI,
+            solve them online, review results and receive useful feedback by email.
+        </p>
+    </div>
+
+    <div class="mini-features">
+        <div class="mini-feature">
+            <div class="mini-feature-title">AI quiz generation</div>
+            <div class="mini-feature-text">Generate multiple-choice quizzes from a topic or source text.</div>
+        </div>
+
+        <div class="mini-feature">
+            <div class="mini-feature-title">Quiz solving</div>
+            <div class="mini-feature-text">Complete quizzes online and get your score instantly.</div>
+        </div>
+
+        <div class="mini-feature">
+            <div class="mini-feature-title">Email notifications</div>
+            <div class="mini-feature-text">Receive a welcome email and result summaries after completion.</div>
+        </div>
+    </div>
+</aside>
+
+<main class="panel-right">
+    <div class="content-wrapper">
+        <div class="auth-box" sec:authorize="isAuthenticated()">
+            <span class="auth-dot"></span>
+            <span>You are signed in as <strong sec:authentication="name">user@example.com</strong></span>
+        </div>
+
+        <div class="top-copy">
+            <span class="step-label">Welcome</span>
+            <h2>A clean cloud-based platform for creating, solving and reviewing quizzes.</h2>
+            <p>
+                The application combines secure authentication, AI-powered question generation,
+                quiz persistence, result tracking and cloud-based email notifications in a single workflow.
+            </p>
+        </div>
+
+        <div class="cta-row" sec:authorize="isAnonymous()">
+            <a th:href="@{/register}" class="btn-primary">Create account</a>
+            <a th:href="@{/login}" class="btn-secondary">Sign in</a>
+        </div>
+
+        <div class="cta-row" sec:authorize="isAuthenticated()">
+            <a th:href="@{/dashboard}" class="btn-primary">Go to dashboard</a>
+            <form th:action="@{/logout}" method="post" style="margin:0;">
+                <button type="submit" class="btn-secondary" style="font-family:'DM Sans',sans-serif; cursor:pointer;">
+                    Logout
+                </button>
+            </form>
+        </div>
+
+        <section class="cards-grid">
+            <div class="card card-large">
+                <div class="card-title">What you can do</div>
+                <div class="card-subtitle">
+                    Main capabilities available in the application.
+                </div>
+
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-item-title">Create an account and sign in</div>
+                        <div class="feature-item-text">
+                            Users can register, log in securely and access their personal quiz workspace.
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-item-title">Generate quizzes with AI</div>
+                        <div class="feature-item-text">
+                            OpenAI is used to create multiple-choice quizzes based on a chosen topic, difficulty and optional source text.
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-item-title">Solve quizzes and review results</div>
+                        <div class="feature-item-text">
+                            Each quiz can be completed online, scored automatically and reviewed together with explanations.
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-item-title">Receive email notifications</div>
+                        <div class="feature-item-text">
+                            SendGrid is used to deliver a welcome email after registration and a quiz result email after submission.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-medium">
+                <div class="card-title">How it works</div>
+                <div class="card-subtitle">
+                    Simple user flow from start to finish.
+                </div>
+
+                <div class="simple-list">
+                    <div class="simple-item">
+                        <div class="simple-item-title">1. Register or sign in</div>
+                        <div class="simple-item-text">
+                            Access the platform through a personal account.
+                        </div>
+                    </div>
+
+                    <div class="simple-item">
+                        <div class="simple-item-title">2. Generate a quiz</div>
+                        <div class="simple-item-text">
+                            Choose a topic, select a difficulty and let the AI prepare the questions.
+                        </div>
+                    </div>
+
+                    <div class="simple-item">
+                        <div class="simple-item-title">3. Solve and submit</div>
+                        <div class="simple-item-text">
+                            Answer the questions online and receive an instant score.
+                        </div>
+                    </div>
+
+                    <div class="simple-item">
+                        <div class="simple-item-title">4. Review and revisit</div>
+                        <div class="simple-item-text">
+                            Check explanations, browse quiz history and receive results by email.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-full">
+                <div class="card-title">Cloud services used</div>
+                <div class="card-subtitle">
+                    The application integrates external cloud services for its core functionality.
+                </div>
+
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-item-title">OpenAI</div>
+                        <div class="feature-item-text">
+                            Used for AI-powered quiz generation, including questions, answer options and explanations.
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-item-title">SendGrid</div>
+                        <div class="feature-item-text">
+                            Used for transactional emails such as the welcome email and the quiz result summary.
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-item-title">Cloud deployment</div>
+                        <div class="feature-item-text">
+                            The application will be published online together with its database so it can be demonstrated remotely.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+</body>
+</html>

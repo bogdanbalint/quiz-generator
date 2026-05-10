@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --ink: #0f0e0d;
+            --paper: #f5f2ed;
+            --accent: #e8441a;
+            --muted: #7a756e;
+            --border: #d8d3cb;
+            --card: #ffffff;
+            --error-bg: #fff3f0;
+            --error-border: #f5c2b8;
+            --error-text: #b93320;
+            --success-bg: #f0faf4;
+            --success-border: #a8dbb8;
+            --success-text: #1e7a42;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--paper);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            align-items: stretch;
+            overflow: hidden;
+        }
+
+        .panel-left {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 40px;
+            animation: fadeUp 0.6s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 48px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--ink);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+        }
+
+        .form-header {
+            margin-bottom: 32px;
+        }
+
+        .form-header .step-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .form-header .step-label::before {
+            content: '';
+            display: block;
+            width: 20px;
+            height: 1.5px;
+            background: var(--accent);
+        }
+
+        .form-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            color: var(--ink);
+        }
+
+        .form-header p {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--muted);
+            font-weight: 300;
+        }
+
+        .alert {
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .alert-error {
+            background: var(--error-bg);
+            border: 1px solid var(--error-border);
+            border-left: 3px solid var(--error-text);
+            color: var(--error-text);
+        }
+
+        .alert-success {
+            background: var(--success-bg);
+            border: 1px solid var(--success-border);
+            border-left: 3px solid var(--success-text);
+            color: var(--success-text);
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field label {
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap .field-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--muted);
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            background: var(--card);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrap input:focus {
+            border-color: var(--ink);
+            box-shadow: 0 0 0 3px rgba(15,14,13,0.06);
+        }
+
+        .input-wrap:focus-within .field-icon {
+            color: var(--ink);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            font-family: 'Syne', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            background: var(--ink);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .btn-submit:hover {
+            background: #2a2826;
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .form-footer {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--muted);
+        }
+
+        .form-footer a {
+            color: var(--ink);
+            font-weight: 500;
+            text-decoration: none;
+            border-bottom: 1.5px solid var(--border);
+            padding-bottom: 1px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .form-footer a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .panel-right {
+            width: 42%;
+            background-color: var(--ink);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px 52px;
+            position: relative;
+            overflow: hidden;
+            animation: slideInRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(60px); opacity: 0; }
+            to   { transform: translateX(0); opacity: 1; }
+        }
+
+        .panel-right::before {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            right: -100px;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232,68,26,0.22) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .panel-right::after {
+            content: '';
+            position: absolute;
+            top: -60px;
+            left: -80px;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232,68,26,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .deco-cards {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 48px;
+        }
+
+        .deco-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            backdrop-filter: blur(4px);
+        }
+
+        .deco-card:nth-child(2) {
+            margin-left: 24px;
+        }
+
+        .deco-card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .deco-card-text {
+            flex: 1;
+        }
+
+        .deco-card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            letter-spacing: -0.01em;
+        }
+
+        .deco-card-sub {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.35);
+            margin-top: 2px;
+        }
+
+        .deco-card-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        .badge-green  { background: rgba(52,199,89,0.15); color: #34c759; }
+        .badge-orange { background: rgba(255,149,0,0.15); color: #ff9500; }
+        .badge-blue   { background: rgba(90,162,255,0.15); color: #5aa2ff; }
+
+        .panel-cta {
+            position: relative;
+            z-index: 1;
+        }
+
+        .panel-cta h2 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: clamp(1.8rem, 2.5vw, 2.4rem);
+            color: #fff;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 12px;
+        }
+
+        .panel-cta h2 span {
+            color: var(--accent);
+        }
+
+        .panel-cta p {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.45);
+            font-weight: 300;
+            max-width: 280px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                overflow: auto;
+                flex-direction: column;
+            }
+
+            .panel-right {
+                width: 100%;
+                padding: 32px 28px;
+                min-height: unset;
+            }
+
+            .deco-cards {
+                display: none;
+            }
+
+            .panel-left {
+                padding: 40px 24px;
+            }
+
+            .brand {
+                margin-bottom: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<main class="panel-left">
+    <div class="form-wrapper">
+        <div class="brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z"/>
+                </svg>
+            </div>
+            <span class="brand-name">QuizGen</span>
+        </div>
+
+        <div class="form-header">
+            <span class="step-label">Welcome back</span>
+            <h1>Sign in</h1>
+            <p>Enter your credentials to continue.</p>
+        </div>
+
+        <div th:if="${param.error}" class="alert alert-error">
+            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            Invalid email or password.
+        </div>
+
+        <div th:if="${param.logout}" class="alert alert-success">
+            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            You have been logged out.
+        </div>
+
+        <div th:if="${param.registered}" class="alert alert-success">
+            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Account created successfully. You can now log in.
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="field-group">
+                <div class="field">
+                    <label>Email</label>
+                    <div class="input-wrap">
+                        <svg class="field-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                        </svg>
+                        <input type="email" name="username" required placeholder="you@example.com">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Password</label>
+                    <div class="input-wrap">
+                        <svg class="field-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        <input type="password" name="password" required placeholder="••••••••">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Sign in
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"/>
+                    <path d="m12 5 7 7-7 7"/>
+                </svg>
+            </button>
+        </form>
+
+        <p class="form-footer">
+            Don't have an account?
+            <a th:href="@{/register}">Create one</a>
+        </p>
+    </div>
+</main>
+
+<aside class="panel-right">
+    <div class="deco-cards">
+        <div class="deco-card">
+            <div class="deco-card-icon" style="background:#e8441a20;">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill:var(--accent);">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/>
+                </svg>
+            </div>
+            <div class="deco-card-text">
+                <div class="deco-card-title">World History Quiz</div>
+                <div class="deco-card-sub">20 questions · 15 min</div>
+            </div>
+            <span class="deco-card-badge badge-green">Live</span>
+        </div>
+
+        <div class="deco-card">
+            <div class="deco-card-icon" style="background:#5aa2ff20;">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill:#5aa2ff;">
+                    <path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z"/>
+                </svg>
+            </div>
+            <div class="deco-card-text">
+                <div class="deco-card-title">Science Trivia</div>
+                <div class="deco-card-sub">15 questions · 10 min</div>
+            </div>
+            <span class="deco-card-badge badge-blue">Draft</span>
+        </div>
+
+        <div class="deco-card">
+            <div class="deco-card-icon" style="background:#ff950020;">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="fill:#ff9500;">
+                    <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm2 10h-4v-1h1v-4h-1v-1h3v5h1v1z"/>
+                </svg>
+            </div>
+            <div class="deco-card-text">
+                <div class="deco-card-title">Pop Culture 2024</div>
+                <div class="deco-card-sub">25 questions · 20 min</div>
+            </div>
+            <span class="deco-card-badge badge-orange">Soon</span>
+        </div>
+    </div>
+
+    <div class="panel-cta">
+        <h2>Your quizzes<br>are waiting <span>for you.</span></h2>
+        <p>Sign in to manage your quizzes, track results, and keep creating.</p>
+    </div>
+</aside>
+
+</body>
+</html>

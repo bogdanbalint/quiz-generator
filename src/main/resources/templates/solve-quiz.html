@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Solve Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --ink: #0f0e0d; --paper: #f5f2ed; --accent: #e8441a; --muted: #7a756e;
+            --border: #d8d3cb; --card: #ffffff; --error-bg: #fff3f0; --error-border: #f5c2b8;
+            --error-text: #b93320; --shadow: 0 12px 30px rgba(15,14,13,0.06);
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; }
+        .panel-left {
+            width: 32%; min-width: 320px; max-width: 430px; background: var(--ink); color: white;
+            padding: 40px 36px; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .brand { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .brand-left { display: flex; align-items: center; gap: 12px; }
+        .brand-icon { width: 40px; height: 40px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .brand-icon svg { width: 22px; height: 22px; fill: white; }
+        .brand-name { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; }
+        .logout-btn {
+            background: transparent; border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.82);
+            border-radius: 10px; padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; cursor: pointer;
+        }
+        .left-copy .eyebrow {
+            display: inline-flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 500;
+            letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+        }
+        .left-copy .eyebrow::before {
+            content: ''; display: block; width: 20px; height: 1.5px; background: var(--accent);
+        }
+        .left-copy h1 {
+            font-family: 'Syne', sans-serif; font-size: clamp(2rem, 3vw, 3rem); font-weight: 800;
+            line-height: 1.05; letter-spacing: -0.04em; margin-bottom: 14px;
+        }
+        .left-copy h1 span { color: var(--accent); }
+        .left-copy p {
+            max-width: 320px; color: rgba(255,255,255,0.52); font-size: 0.93rem; line-height: 1.75; font-weight: 300;
+        }
+        .panel-right { flex: 1; padding: 36px 36px 48px; overflow-y: auto; min-height: 100vh; }
+        .topbar {
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 28px;
+        }
+        .topbar h2 {
+            font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1.05;
+        }
+        .topbar p { margin-top: 8px; color: var(--muted); font-size: 0.94rem; }
+        .user-chip {
+            background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; min-width: 220px; box-shadow: var(--shadow);
+        }
+        .user-chip-label {
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px;
+        }
+        .user-chip-value { font-weight: 500; color: var(--ink); }
+        .card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 22px; box-shadow: var(--shadow);
+        }
+        .card-title {
+            font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 8px;
+        }
+        .card-subtitle {
+            color: var(--muted); font-size: 0.92rem; line-height: 1.65; margin-bottom: 18px;
+        }
+        .global-error {
+            background: var(--error-bg); border: 1px solid var(--error-border); border-left: 3px solid var(--error-text);
+            border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; color: var(--error-text); font-size: 0.9rem;
+        }
+        .question-list { display: flex; flex-direction: column; gap: 18px; }
+        .question-item {
+            border: 1px solid var(--border); border-radius: 14px; padding: 18px; background: rgba(255,255,255,0.72);
+        }
+        .question-number {
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 8px;
+        }
+        .question-text { font-weight: 600; margin-bottom: 14px; line-height: 1.55; }
+        .options { display: grid; gap: 10px; }
+        .option-label {
+            display: flex; align-items: center; gap: 10px; border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px 14px; background: #fff; cursor: pointer;
+        }
+        .option-label input { accent-color: var(--accent); }
+        .actions { display: flex; gap: 14px; margin-top: 26px; flex-wrap: wrap; }
+        .btn-primary, .btn-secondary {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 18px;
+            border-radius: 12px; text-decoration: none; font-weight: 600; transition: transform 0.15s, background 0.2s, border-color 0.2s, color 0.2s;
+            cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.94rem;
+        }
+        .btn-primary { background: var(--ink); color: #fff; border: 1px solid var(--ink); }
+        .btn-primary:hover { background: #252321; transform: translateY(-1px); }
+        .btn-secondary { background: #fff; color: var(--ink); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: rgba(232,68,26,0.45); color: var(--accent); transform: translateY(-1px); }
+
+        @media (max-width: 820px) {
+            body { flex-direction: column; }
+            .panel-left { width: 100%; max-width: none; min-width: 0; padding: 30px 24px; }
+            .panel-right { padding: 28px 20px 40px; min-height: auto; }
+            .topbar { flex-direction: column; }
+            .user-chip { width: 100%; min-width: unset; }
+        }
+    </style>
+</head>
+<body>
+<aside class="panel-left">
+    <div class="brand">
+        <div class="brand-left">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z"/></svg>
+            </div>
+            <span class="brand-name">QuizGen</span>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </div>
+
+    <div class="left-copy">
+        <span class="eyebrow">Solve quiz</span>
+        <h1>Answer each <span>question.</span></h1>
+        <p>Choose one answer for every question and submit your attempt to see the final result.</p>
+    </div>
+</aside>
+
+<main class="panel-right">
+    <div class="topbar">
+        <div>
+            <h2 th:text="${quiz.topic}">Quiz topic</h2>
+            <p>Difficulty: <span th:text="${quiz.difficulty}">MEDIUM</span></p>
+        </div>
+
+        <div class="user-chip">
+            <div class="user-chip-label">Account</div>
+            <div class="user-chip-value" sec:authentication="name">user@example.com</div>
+        </div>
+    </div>
+
+    <section class="card">
+        <div class="card-title">Quiz questions</div>
+        <div class="card-subtitle">Answer all questions before submitting.</div>
+
+        <div th:if="${quizError}" class="global-error">
+            <span th:text="${quizError}"></span>
+        </div>
+
+        <form th:action="@{/quizzes/{id}/solve(id=${quiz.id})}" th:object="${submitQuizRequest}" method="post">
+            <div class="question-list">
+                <div class="question-item" th:each="question, stat : ${quiz.questions}">
+                    <div class="question-number">
+                        Question <span th:text="${stat.index + 1}">1</span>
+                    </div>
+
+                    <div class="question-text" th:text="${question.questionText}">Question text</div>
+
+                    <div class="options">
+                        <label class="option-label">
+                            <input type="radio" th:name="${'answers[' + question.id + ']'}" value="A">
+                            <span><strong>A.</strong> <span th:text="${question.optionA}">Option A</span></span>
+                        </label>
+
+                        <label class="option-label">
+                            <input type="radio" th:name="${'answers[' + question.id + ']'}" value="B">
+                            <span><strong>B.</strong> <span th:text="${question.optionB}">Option B</span></span>
+                        </label>
+
+                        <label class="option-label">
+                            <input type="radio" th:name="${'answers[' + question.id + ']'}" value="C">
+                            <span><strong>C.</strong> <span th:text="${question.optionC}">Option C</span></span>
+                        </label>
+
+                        <label class="option-label">
+                            <input type="radio" th:name="${'answers[' + question.id + ']'}" value="D">
+                            <span><strong>D.</strong> <span th:text="${question.optionD}">Option D</span></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn-primary">Submit quiz</button>
+                <a th:href="@{/quizzes/{id}(id=${quiz.id})}" class="btn-secondary">Back to details</a>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>
