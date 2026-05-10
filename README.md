@@ -197,12 +197,12 @@ Pana in acest moment au fost implementate:
 
 ⸻
 
-10. Referinte
+# 10. Referinte
 
-* Spring Boot Documentation
-* Spring Security Documentation
-* Thymeleaf Documentation
-* PostgreSQL Documentation
-* OpenAI API Documentation
-* SendGrid Documentation
-* AWS EC2 Documentation 
+- [Spring Boot Documentation](https://docs.spring.io/spring-boot/reference/index.html)
+- [Spring Security Documentation](https://docs.spring.io/spring-security/reference/index.html)
+- [Thymeleaf Documentation](https://www.thymeleaf.org/documentation.html)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/current/index.html)
+- [OpenAI API Documentation](https://platform.openai.com/docs/overview)
+- [Twilio SendGrid Documentation](https://www.twilio.com/docs/sendgrid)
+- [AWS EC2 Documentation](https://docs.aws.amazon.com/ec2/)
