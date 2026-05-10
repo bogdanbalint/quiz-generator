@@ -8,6 +8,8 @@ https://youtu.be/4y00axhq65U
 ## Link publicare
 http://51.20.69.169:8080/
 
+## Repo link
+https://github.com/bogdanbalint/quiz-generator/tree/main
 ---
 
 # 1. Introducere
