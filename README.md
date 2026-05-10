@@ -168,7 +168,7 @@ Aplicatia Spring Boot a fost rulata sub forma de fisier JAR, iar accesul din ext
 
 Exemplu link public:
 
-http://[IP_PUBLIC_EC2]:8080
+http://51.20.69.169:8080/
 
 # 9. Functionalitati implementate
 
