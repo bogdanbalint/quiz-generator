@@ -117,6 +117,7 @@ Aplicatia foloseste:
 # 5. Capturi ecran aplicatie
 
 - Pagina Home
+- ![img.png](img.png)
 - Pagina Register
 - Pagina Login
 - Dashboard
